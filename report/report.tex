@@ -24,10 +24,9 @@
 \usepackage{parskip}
 
 
-\title{INF3315 - Privacy Preserving Computation \\ \Large Assignment 3}
-
+\title{INF3315 - Privacy Preserving Computation \\ \Large Assignment 4}
 \author{Sebastian Mai}
-\date{DUE: Monday 2.November.2026}
+\date{DUE: Thursday 19.ovember.2026}
 
 
 \begin{document}
@@ -110,7 +109,7 @@ giving us a better accuracy. This is a balance again that needs to be struck.
 \textbf{LO5-6:} explain the difference between pure $\epsilon$-differential privacy and ($\epsilon,\delta$)-differential privacy, and compute the total privacy loss of repeated Gaussian queries with an accountant and decide, for a given noise level and number of queries, whether Laplace or Gaussian noise gives the lower total privacy loss, and explain why.
 
 Up to 24 calls Laplace is the better choice than Gaussian for the noise level of Task 3. After that the Gaussian has the lower total $\epsilon'$. When it switches depends on the noise level itself.
-At noise level std 10 Laplace is only better up to 14 calls. So yes the MIT group is correct as Gaussian gives less noise. But this only holds if MIT really does many requests. The reason why Laplace is better at low calls is that it adds it linearly.
+At noise level std 10 Laplace is only better up to 14 calls. So yes the MIT group is correct as Gaussian gives less total $\epsilon$. But this only holds if MIT really does many requests. The reason why Laplace is better at low calls is that it adds it linearly.
 Gaussian however does not. We calculate the RDP cost based. This is a linear cost. But converting it using the square root is the key part. The square root will grow slower and slower the more queries there are.
 
 \begin{figure}[H]
@@ -119,5 +118,10 @@ Gaussian however does not. We calculate the RDP cost based. This is a linear cos
     \caption{Total privacy loss $\epsilon'$ against the number of count queries at the same noise per call (standard deviation $\sqrt{2}$, as in Task 3): Laplace (blue, sequential composition) and Gaussian (orange, RDP accountant at $\delta = 10^{-6}$). Laplace has the lower $\epsilon'$ up to 24 calls.}
     \label{fig:eps-calls}
 \end{figure}
+
+\section{AI declaration}
+The report was not written with AI. The only thing the ai did was adding the figures and tables. The entire 
+code however is written using ai (Level 4) and manually verfied. I used claude code for that. The model doing the work was Opus 5.5.
+In addition I used the uit-ai-skill. I verfied manually and by running the tests. Most of the answers were correct and little to no change was needed.
 
 \end{document}
