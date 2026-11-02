@@ -53,15 +53,15 @@ getDiabeticsByZip(0308) returns 1, meaning there is only a single person that is
 A little bit more about sparse cells. Looking at the county-age heatmap numbers a total of 3360 contained fewer than 5 people. Those cells contained 52\% all the entire dataset.
 Sparse cells pose a privacy risk as fewer people in the combination means also easier indentification. 
 
-\begin{figure}[htbp]
-    \centeringn about
+\begin{figure}[H]
+    \centering
     \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{heatmap_county_age.pdf}
     \caption{Survey respondents per \{County, Age\}. Counties are sorted by number of respondents; cells with 1--4 respondents are marked red as sparse.}
     \label{fig:heatmap}
 \end{figure}
 
 \section{Task 2:}
-\textbf{LO2:} derive the sensitivity of count, sum and average queries from their definition, and explain why clamping bounds must be fixed without looking at the data and explain how $\epsilon$
+\textbf{LO2-3:} derive the sensitivity of count, sum and average queries from their definition, and explain why clamping bounds must be fixed without looking at the data and explain how $\epsilon$
  trades accuracy against privacy, and why post-processing a noisy result does not weaken the guarantee.
 
 The sensitivity generally describes how much a queries answer can change when one person's record is added or removed. Therefor the logical one for count is 1. Adding or removing 1 not more than 1 can change in the count.
@@ -90,5 +90,21 @@ Since we are only changing the already noisy result changing this reveals no add
     \texttt{getAvgAgeByZip} & small & 0015 & 1 & 21 & 39.48 & 34.32 & 14.61 \\
     \hline
 \end{tabular}
+
+\section{Task 3:}
+\textbf{LO4:} track a privacy budget with sequential composition, and explain when parallel composition applies.
+
+I chose a privacy budget of 5 and a bin size of 10. Parallel composition is: Because each person affects only one bin, we don't add the privacy costs of all 10 bins. We charge only the maximum cost of one bin.
+The logical consequence from this ofc is that when I request the same histogram for the same district again then I will request the same data hence disjointness no longer holds and we spend another epsilon of our budget.
+The reason I chose 10 as a bin width despite the test failing is that the accuracy is better for wider bins. A count + noise will only be done once for the bin but the relative skewing of the result is a lot less for wider bins
+giving us a better accuracy. This is a balance again that needs to be struck.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{histogram_dp.pdf}
+    \caption{Diabetics by age in Oslo: true histogram (blue) and DP histogram from \texttt{getAgeHistogram} (orange), with 10-year age bins and $\epsilon = 1$ charged once for the whole histogram.}
+    \label{fig:histo}
+\end{figure}
+
 
 \end{document}
