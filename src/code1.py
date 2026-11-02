@@ -79,3 +79,38 @@ def getAvgAgeByCountyDP(county: str, epsilon: float = EPSILON) -> float:
 
 def getAvgAgeByZipDP(zip: str, epsilon: float = EPSILON) -> float:
     return _noisyMeanAge(survey.query('Diabetic == 1 and Zipcode == @zip'), epsilon)
+
+
+# The seven DP queries as one API object on a given survey, for a4_adapter.py.
+
+class DiabetesAPI:
+    def __init__(self, survey: pd.DataFrame, epsilon: float = EPSILON):
+        self.survey = survey
+        self.epsilon = epsilon
+
+    def _count(self, condition: str, **params) -> int:
+        return _noisyCount(self.survey.query(condition, local_dict=params)['Diabetic'].sum(), self.epsilon)
+
+    def _meanAge(self, condition: str, **params) -> float:
+        return _noisyMeanAge(self.survey.query('Diabetic == 1 and ' + condition, local_dict=params), self.epsilon)
+
+    def getDiabeticsByZip(self, zip: str) -> int:
+        return self._count('Zipcode == @zip', zip=zip)
+
+    def getDiabeticsByCounty(self, county: str) -> int:
+        return self._count('County == @county', county=county)
+
+    def getDiabeticsByAge(self, age: int) -> int:
+        return self._count('Age == @age', age=age)
+
+    def getDiabeticsByCountyAge(self, county: str, age: int) -> int:
+        return self._count('County == @county and Age == @age', county=county, age=age)
+
+    def getAverageAge(self) -> float:
+        return self._meanAge('True')
+
+    def getAvgAgeByCounty(self, county: str) -> float:
+        return self._meanAge('County == @county', county=county)
+
+    def getAvgAgeByZip(self, zip: str) -> float:
+        return self._meanAge('Zipcode == @zip', zip=zip)
