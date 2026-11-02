@@ -1,2 +1,8 @@
 *.csv
 *__
+*.out
+*.log
+*.gz
+*.aux
+*.fdb*
+*.fls
