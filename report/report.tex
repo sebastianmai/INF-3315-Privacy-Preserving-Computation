@@ -106,5 +106,18 @@ giving us a better accuracy. This is a balance again that needs to be struck.
     \label{fig:histo}
 \end{figure}
 
+\section{Task 4:}
+\textbf{LO5-6:} explain the difference between pure $\epsilon$-differential privacy and ($\epsilon,\delta$)-differential privacy, and compute the total privacy loss of repeated Gaussian queries with an accountant and decide, for a given noise level and number of queries, whether Laplace or Gaussian noise gives the lower total privacy loss, and explain why.
+
+Up to 24 calls Laplace is the better choice than Gaussian for the noise level of Task 3. After that the Gaussian has the lower total $\epsilon'$. When it switches depends on the noise level itself.
+At noise level std 10 Laplace is only better up to 14 calls. So yes the MIT group is correct as Gaussian gives less noise. But this only holds if MIT really does many requests. The reason why Laplace is better at low calls is that it adds it linearly.
+Gaussian however does not. We calculate the RDP cost based. This is a linear cost. But converting it using the square root is the key part. The square root will grow slower and slower the more queries there are.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{epsilon_vs_calls.pdf}
+    \caption{Total privacy loss $\epsilon'$ against the number of count queries at the same noise per call (standard deviation $\sqrt{2}$, as in Task 3): Laplace (blue, sequential composition) and Gaussian (orange, RDP accountant at $\delta = 10^{-6}$). Laplace has the lower $\epsilon'$ up to 24 calls.}
+    \label{fig:eps-calls}
+\end{figure}
 
 \end{document}
