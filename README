@@ -5,7 +5,7 @@ Layout
   src/code1.py        Survey queries (Task 1) and their differentially
                       private versions using the Laplace mechanism (Task 2)
   src/reidentify.py   Re-identification risk: k-anonymity of the link
-                      with pii.csv and {County, Age} heatmaps (Task 1)
+                      with pii.csv and {County, Age} heatmap (Task 1)
   src/code1_test.py   Tests for code1.py
   src/a4_adapter.py
   src/test_a4.py

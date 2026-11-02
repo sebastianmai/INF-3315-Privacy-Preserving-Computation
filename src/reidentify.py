@@ -1,8 +1,8 @@
 """Task 1: re-identification risk of the survey API, using the public tax registry (pii.csv).
 
 Run from src/:  python reidentify.py
-Prints the k-anonymity figures and an example attack, and writes the heatmaps
-to ../report/heatmap_county_age.pdf and ../report/heatmap_county_ageband.pdf.
+Prints the k-anonymity figures and an example attack, and writes the heatmap
+to ../report/heatmap_county_age.pdf.
 """
 
 from pathlib import Path
@@ -142,16 +142,10 @@ if __name__ == '__main__':
           f'{code1.getDiabeticsByCountyAge(example["County"], example["Age"])}\n')
 
     by_age = county_table(survey, 'Age')
-    bands = pd.cut(survey['Age'], bins=[20, 30, 40, 50, 60, 70, 80],
-                   labels=['21-30', '31-40', '41-50', '51-60', '61-70', '71-77'])
-    by_band = county_table(survey.assign(**{'Age band': bands}), 'Age band')
-    for name, table in [('County x Age', by_age), ('County x 10-year age band', by_band)]:
-        cells, sparse, people = sparse_share(table)
-        print(f'{name}: {cells} non-empty cells, {sparse} sparse (< {SPARSE}) = {sparse / cells:.0%}, '
-              f'holding {people} respondents = {people / len(survey):.0%}')
+    cells, sparse, people = sparse_share(by_age)
+    print(f'County x Age: {cells} non-empty cells, {sparse} sparse (< {SPARSE}) = {sparse / cells:.0%}, '
+          f'holding {people} respondents = {people / len(survey):.0%}')
 
     REPORT.mkdir(exist_ok=True)
     plot_heatmap(by_age, 'Survey respondents per {County, Age}', REPORT / 'heatmap_county_age.pdf')
-    plot_heatmap(by_band, 'Survey respondents per {County, 10-year age band}',
-                 REPORT / 'heatmap_county_ageband.pdf')
-    print(f'\nHeatmaps written to {REPORT}')
+    print(f'\nHeatmap written to {REPORT / "heatmap_county_age.pdf"}')
