@@ -11,7 +11,10 @@ Layout
   src/task3.py        Task 3: privacy budget (PrivacyBudget,
                       BudgetedDiabetesAPI), DP age histogram
                       (getAgeHistogram), true vs. DP comparison and bin widths
-  src/a4_adapter.py   Connects task2.py and task3.py to test_a4.py
+  src/task4.py        Task 4: Gaussian API (GaussianDiabetesAPI) with an RDP
+                      accountant (RDPPrivacyBudget), and total epsilon' of
+                      Laplace vs. Gaussian noise against the number of calls
+  src/a4_adapter.py   Connects task2.py, task3.py and task4.py to test_a4.py
   src/test_a4.py      Self-check tests for Tasks 2-4 (given)
   src/survey.csv      Survey data
   src/pii.csv         PII data
@@ -26,4 +29,5 @@ Running
   python task1.py
   python task2.py
   python task3.py
+  python task4.py
   pytest test_a4.py -v

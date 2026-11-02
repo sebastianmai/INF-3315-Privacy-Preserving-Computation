@@ -30,20 +30,6 @@ EPSILON = 1.0
 # Public upper bound on age. Must not be derived from the data.
 AGE_MAX = 100
 
-def _noisyCount(value: int, epsilon: float) -> int:
-    # Post-processing: round to a non-negative integer.
-    return max(0, round(laplace_mechanism(value, epsilon, COUNT_SENSITIVITY)))
-
-def _noisyMeanAge(ages: pd.Series, epsilon: float) -> float:
-    # A mean has no fixed sensitivity, so release a noisy sum of clipped ages
-    # (sensitivity AGE_MAX) and a noisy count (sensitivity 1), each with
-    # epsilon/2. By sequential composition the result is epsilon-DP.
-    ages = ages.clip(0, AGE_MAX)
-    noisy_sum = laplace_mechanism(ages.sum(), epsilon / 2, AGE_MAX)
-    noisy_count = laplace_mechanism(len(ages), epsilon / 2, COUNT_SENSITIVITY)
-    return float(np.clip(noisy_sum / max(noisy_count, 1), 0, AGE_MAX))
-
-
 class DiabetesAPI(SurveyAPI):
     """The seven Task 1 queries, each answered with epsilon-DP Laplace noise."""
 
@@ -51,11 +37,27 @@ class DiabetesAPI(SurveyAPI):
         super().__init__(survey)
         self.epsilon = epsilon
 
+    def _noise(self, value: float, sensitivity: float, epsilon: float) -> float:
+        return laplace_mechanism(value, epsilon, sensitivity)
+
+    def _noisyCount(self, value: int) -> int:
+        # Post-processing: round to a non-negative integer.
+        return max(0, round(self._noise(value, COUNT_SENSITIVITY, self.epsilon)))
+
+    def _noisyMeanAge(self, ages: pd.Series) -> float:
+        # A mean has no fixed sensitivity, so release a noisy sum of clipped ages
+        # (sensitivity AGE_MAX) and a noisy count (sensitivity 1), each with
+        # epsilon/2. By sequential composition the result is epsilon-DP.
+        ages = ages.clip(0, AGE_MAX)
+        noisy_sum = self._noise(ages.sum(), AGE_MAX, self.epsilon / 2)
+        noisy_count = self._noise(len(ages), COUNT_SENSITIVITY, self.epsilon / 2)
+        return float(np.clip(noisy_sum / max(noisy_count, 1), 0, AGE_MAX))
+
     def _count(self, condition: str, **params) -> int:
-        return _noisyCount(super()._count(condition, **params), self.epsilon)
+        return self._noisyCount(super()._count(condition, **params))
 
     def _meanAge(self, condition: str, **params) -> float:
-        return _noisyMeanAge(self._rows('Diabetic == 1 and ' + condition, **params)['Age'], self.epsilon)
+        return self._noisyMeanAge(self._rows('Diabetic == 1 and ' + condition, **params)['Age'])
 
 
 # Accuracy of the DP queries compared with the plain ones

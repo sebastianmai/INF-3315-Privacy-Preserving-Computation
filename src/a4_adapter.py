@@ -12,6 +12,7 @@ import pandas as pd
 
 import task2
 import task3
+import task4
 
 # Task 2: the fixed bounds [L, U] you clamp ages to (chosen without looking at the data).
 AGE_BOUNDS = (0, task2.AGE_MAX)
@@ -44,19 +45,19 @@ def budget_used(api) -> float:
 
 def make_gaussian_api(survey: pd.DataFrame, epsilon: float, delta: float, budget: float | None = None):
     """Task 4: as make_api, but with Gaussian noise and (epsilon, delta) accounting."""
-    raise NotImplementedError
+    return task4.GaussianDiabetesAPI(survey, epsilon, delta, budget)
 
 
 def privacy_loss(api) -> tuple:
     """Task 4: the total (epsilon', delta) that `api` reports to the user."""
-    raise NotImplementedError
+    return api.privacy_loss, api.delta
 
 
 def laplace_total_epsilon(k: int, noise_std: float) -> float:
     """Task 4: total epsilon of k Laplace count queries (sensitivity 1) whose noise has this standard deviation."""
-    raise NotImplementedError
+    return task4.laplace_total_epsilon(k, noise_std)
 
 
 def gaussian_total_epsilon(k: int, noise_std: float, delta: float) -> float:
     """Task 4: total epsilon from your accountant for k Gaussian count queries (sensitivity 1) with this standard deviation."""
-    raise NotImplementedError
+    return task4.gaussian_total_epsilon(k, noise_std, delta)

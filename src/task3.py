@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 from task1 import load_survey
-from task2 import EPSILON, DiabetesAPI, _noisyCount
+from task2 import AGE_MAX, COUNT_SENSITIVITY, EPSILON, DiabetesAPI
 
 REPORT = Path(__file__).parent.parent / 'report'
 
@@ -61,19 +61,21 @@ class BudgetedDiabetesAPI(DiabetesAPI):
     def privacy_loss(self) -> float:
         return self.budget.used
 
-    def _spend(self) -> None:
-        if not self.budget.use_budget(self.epsilon):
+    def _spend(self, *releases: tuple[float, float]) -> None:
+        """Charge one call made of noisy releases (sensitivity, epsilon), or reject it before any noise is drawn."""
+        cost = sum(epsilon for _, epsilon in releases)
+        if not self.budget.use_budget(cost):
             raise PrivacyBudgetExceeded(
                 f'Privacy budget exceeded - try again later. '
-                f'(used epsilon = {self.budget.used:g} of {self.budget.budget:g}, this call needs {self.epsilon:g})')
+                f'(used epsilon = {self.budget.used:g} of {self.budget.budget:g}, this call needs {cost:g})')
 
     def _count(self, condition: str, **params) -> int:
-        self._spend()
+        self._spend((COUNT_SENSITIVITY, self.epsilon))
         return super()._count(condition, **params)
 
     def _meanAge(self, condition: str, **params) -> float:
-        # Sum and count each get epsilon/2, so one charge of epsilon covers both.
-        self._spend()
+        # Sum and count each get epsilon/2, so together they cost epsilon.
+        self._spend((AGE_MAX, self.epsilon / 2), (COUNT_SENSITIVITY, self.epsilon / 2))
         return super()._meanAge(condition, **params)
 
     def getDiabeticsByAgeHistogram(self, county: str) -> list[int]:
@@ -83,9 +85,9 @@ class BudgetedDiabetesAPI(DiabetesAPI):
         most 1. By parallel composition the whole histogram is epsilon-DP and
         is charged once, not once per bin.
         """
-        self._spend()
+        self._spend((COUNT_SENSITIVITY, self.epsilon))
         ages = self._rows('Diabetic == 1 and County == @county', county=county)['Age']
-        return [_noisyCount(count, self.epsilon) for count in age_bins(ages, self.bin_width)]
+        return [self._noisyCount(count) for count in age_bins(ages, self.bin_width)]
 
 
 def age_bins(ages: pd.Series, bin_width: int = BIN_WIDTH) -> np.ndarray:
