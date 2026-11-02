@@ -11,6 +11,7 @@ not from survey.csv, so the tests can run it on modified data.
 import pandas as pd
 
 import task2
+import task3
 
 # Task 2: the fixed bounds [L, U] you clamp ages to (chosen without looking at the data).
 AGE_BOUNDS = (0, task2.AGE_MAX)
@@ -28,19 +29,17 @@ def make_api(survey: pd.DataFrame, epsilon: float, budget: float | None = None):
     budget=None means no budget (Task 2). With a budget (Task 3), a call that
     would exceed it must raise an exception with a clear message.
     """
-    if budget is not None:
-        raise NotImplementedError("privacy budget: Task 3")
-    return task2.DiabetesAPI(survey, epsilon)
+    return task3.BudgetedDiabetesAPI(survey, epsilon, budget)
 
 
 def age_histogram(api, county: str) -> list:
     """Task 3: your getAgeHistogram for `county`, using only `api`."""
-    raise NotImplementedError
+    return task3.getAgeHistogram(county, api)
 
 
 def budget_used(api) -> float:
     """Task 3: the total epsilon spent so far by `api`."""
-    raise NotImplementedError
+    return api.privacy_loss
 
 
 def make_gaussian_api(survey: pd.DataFrame, epsilon: float, delta: float, budget: float | None = None):

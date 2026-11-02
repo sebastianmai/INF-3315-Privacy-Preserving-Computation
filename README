@@ -8,7 +8,10 @@ Layout
   src/task2.py        Task 2: differentially private API (DiabetesAPI,
                       Laplace mechanism) and the accuracy table: true value
                       vs. MAE of the DP queries at three epsilons
-  src/a4_adapter.py   Connects task2.py to test_a4.py
+  src/task3.py        Task 3: privacy budget (PrivacyBudget,
+                      BudgetedDiabetesAPI), DP age histogram
+                      (getAgeHistogram), true vs. DP comparison and bin widths
+  src/a4_adapter.py   Connects task2.py and task3.py to test_a4.py
   src/test_a4.py      Self-check tests for Tasks 2-4 (given)
   src/survey.csv      Survey data
   src/pii.csv         PII data
@@ -22,4 +25,5 @@ Running
   cd src
   python task1.py
   python task2.py
+  python task3.py
   pytest test_a4.py -v
