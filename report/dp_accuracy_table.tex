@@ -1,0 +1,19 @@
+\begin{tabular}{lllrrrrr}
+\hline
+Query & Group & Arguments & $n$ & True & $\varepsilon=0.1$ & $\varepsilon=1$ & $\varepsilon=10$ \\
+\hline
+\texttt{getDiabeticsByZip} & large & 0475 & 5 & 5 & 6.49 & 0.91 & 0 \\
+\texttt{getDiabeticsByZip} & small & 0015 & 1 & 1 & 4.55 & 0.97 & 0.02 \\
+\texttt{getDiabeticsByCounty} & large & OSLO & 386 & 386 & 9.47 & 1.06 & 0.01 \\
+\texttt{getDiabeticsByCounty} & small & AREMARK & 1 & 1 & 5.74 & 0.88 & 0.02 \\
+\texttt{getDiabeticsByAge} & large & 21 & 586 & 586 & 11.74 & 1 & 0.01 \\
+\texttt{getDiabeticsByAge} & small & 49 & 1 & 1 & 7.13 & 0.78 & 0 \\
+\texttt{getDiabeticsByCountyAge} & large & OSLO, 21 & 68 & 68 & 10.05 & 1.07 & 0.02 \\
+\texttt{getDiabeticsByCountyAge} & small & ALSTAHAUG, 22 & 1 & 1 & 6.16 & 0.79 & 0.01 \\
+\texttt{getAverageAge} & all & - & 3344 & 36.23 & 0.73 & 0.07 & 0.01 \\
+\texttt{getAvgAgeByCounty} & large & OSLO & 386 & 36.43 & 4.83 & 0.66 & 0.06 \\
+\texttt{getAvgAgeByCounty} & small & AREMARK & 1 & 47 & 46.3 & 42.09 & 16.36 \\
+\texttt{getAvgAgeByZip} & large & 0475 & 5 & 29.8 & 44.39 & 29.93 & 4.6 \\
+\texttt{getAvgAgeByZip} & small & 0015 & 1 & 21 & 39.48 & 34.32 & 14.61 \\
+\hline
+\end{tabular}

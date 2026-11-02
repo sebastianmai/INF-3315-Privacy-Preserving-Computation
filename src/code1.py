@@ -40,20 +40,27 @@ def laplace_mechanism(value, epsilon, sensitivity):
 # Diabetic is 0/1, so one person changes a count by at most 1.
 COUNT_SENSITIVITY = 1
 
+# Default privacy parameter.
+EPSILON = 1.0
+
 # Public upper bound on age. Must not be derived from the data.
 AGE_MAX = 100
 
-def getDiabeticsByZipDP(zip: str, epsilon: float) -> float:
-    return laplace_mechanism(getDiabeticsByZip(zip), epsilon, COUNT_SENSITIVITY)
+def _noisyCount(value: int, epsilon: float) -> int:
+    # Post-processing: round to a non-negative integer.
+    return max(0, round(laplace_mechanism(value, epsilon, COUNT_SENSITIVITY)))
 
-def getDiabeticsByCountyDP(county: str, epsilon: float) -> float:
-    return laplace_mechanism(getDiabeticsByCounty(county), epsilon, COUNT_SENSITIVITY)
+def getDiabeticsByZipDP(zip: str, epsilon: float = EPSILON) -> int:
+    return _noisyCount(getDiabeticsByZip(zip), epsilon)
 
-def getDiabeticsByAgeDP(age: int, epsilon: float) -> float:
-    return laplace_mechanism(getDiabeticsByAge(age), epsilon, COUNT_SENSITIVITY)
+def getDiabeticsByCountyDP(county: str, epsilon: float = EPSILON) -> int:
+    return _noisyCount(getDiabeticsByCounty(county), epsilon)
 
-def getDiabeticsByCountyAgeDP(county: str, age: int, epsilon: float) -> float:
-    return laplace_mechanism(getDiabeticsByCountyAge(county, age), epsilon, COUNT_SENSITIVITY)
+def getDiabeticsByAgeDP(age: int, epsilon: float = EPSILON) -> int:
+    return _noisyCount(getDiabeticsByAge(age), epsilon)
+
+def getDiabeticsByCountyAgeDP(county: str, age: int, epsilon: float = EPSILON) -> int:
+    return _noisyCount(getDiabeticsByCountyAge(county, age), epsilon)
 
 def _noisyMeanAge(rows: pd.DataFrame, epsilon: float) -> float:
     # A mean has no fixed sensitivity, so release a noisy sum of clipped ages
@@ -64,11 +71,11 @@ def _noisyMeanAge(rows: pd.DataFrame, epsilon: float) -> float:
     noisy_count = laplace_mechanism(len(ages), epsilon / 2, COUNT_SENSITIVITY)
     return float(np.clip(noisy_sum / max(noisy_count, 1), 0, AGE_MAX))
 
-def getAverageAgeDP(epsilon: float) -> float:
+def getAverageAgeDP(epsilon: float = EPSILON) -> float:
     return _noisyMeanAge(survey.query('Diabetic == 1'), epsilon)
 
-def getAvgAgeByCountyDP(county: str, epsilon: float) -> float:
+def getAvgAgeByCountyDP(county: str, epsilon: float = EPSILON) -> float:
     return _noisyMeanAge(survey.query('Diabetic == 1 and County == @county'), epsilon)
 
-def getAvgAgeByZipDP(zip: str, epsilon: float) -> float:
+def getAvgAgeByZipDP(zip: str, epsilon: float = EPSILON) -> float:
     return _noisyMeanAge(survey.query('Diabetic == 1 and Zipcode == @zip'), epsilon)

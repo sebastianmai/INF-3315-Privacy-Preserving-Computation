@@ -6,6 +6,8 @@ Layout
                       private versions using the Laplace mechanism (Task 2)
   src/reidentify.py   Re-identification risk: k-anonymity of the link
                       with pii.csv and {County, Age} heatmap (Task 1)
+  src/dp_accuracy.py   Accuracy table: true value vs. MAE of the DP
+                      queries at three epsilons (Task 2)
   src/code1_test.py   Tests for code1.py
   src/a4_adapter.py
   src/test_a4.py
