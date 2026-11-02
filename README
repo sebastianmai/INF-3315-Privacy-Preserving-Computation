@@ -1,0 +1,20 @@
+INF3315 - Privacy Preserving Computation
+Sebastian Mai
+
+Layout
+  src/code1.py        Survey queries (Task 1) and their differentially
+                      private versions using the Laplace mechanism (Task 2)
+  src/code1_test.py   Tests for code1.py
+  src/a4_adapter.py
+  src/test_a4.py
+  src/survey.csv      Survey data
+  src/pii.csv         PII data
+  report/report.tex   Report source
+  report.pdf          Compiled report
+
+Requirements
+  Python 3, numpy, pandas, pytest
+
+Running the tests
+  cd src
+  pytest
