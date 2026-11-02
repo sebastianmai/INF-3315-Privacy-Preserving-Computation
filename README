@@ -2,23 +2,24 @@ INF3315 - Privacy Preserving Computation
 Sebastian Mai
 
 Layout
-  src/code1.py        Survey queries (Task 1) and their differentially
-                      private versions using the Laplace mechanism (Task 2)
-  src/reidentify.py   Re-identification risk: k-anonymity of the link
-                      with pii.csv and {County, Age} heatmap (Task 1)
-  src/dp_accuracy.py   Accuracy table: true value vs. MAE of the DP
-                      queries at three epsilons (Task 2)
-  src/code1_test.py   Tests for code1.py
-  src/a4_adapter.py
-  src/test_a4.py
+  src/task1.py        Task 1: survey API (SurveyAPI) and re-identification
+                      risk: k-anonymity of the link with pii.csv, an example
+                      attack, and the {County, Age} heatmap
+  src/task2.py        Task 2: differentially private API (DiabetesAPI,
+                      Laplace mechanism) and the accuracy table: true value
+                      vs. MAE of the DP queries at three epsilons
+  src/a4_adapter.py   Connects task2.py to test_a4.py
+  src/test_a4.py      Self-check tests for Tasks 2-4 (given)
   src/survey.csv      Survey data
   src/pii.csv         PII data
   report/report.tex   Report source
   report.pdf          Compiled report
 
 Requirements
-  Python 3, numpy, pandas, pytest
+  Python 3, numpy, pandas, matplotlib, pytest
 
-Running the tests
+Running
   cd src
-  pytest
+  python task1.py
+  python task2.py
+  pytest test_a4.py -v

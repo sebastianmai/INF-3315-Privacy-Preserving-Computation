@@ -10,10 +10,10 @@ not from survey.csv, so the tests can run it on modified data.
 
 import pandas as pd
 
-import code1
+import task2
 
 # Task 2: the fixed bounds [L, U] you clamp ages to (chosen without looking at the data).
-AGE_BOUNDS = (0, code1.AGE_MAX)
+AGE_BOUNDS = (0, task2.AGE_MAX)
 
 
 def make_api(survey: pd.DataFrame, epsilon: float, budget: float | None = None):
@@ -30,7 +30,7 @@ def make_api(survey: pd.DataFrame, epsilon: float, budget: float | None = None):
     """
     if budget is not None:
         raise NotImplementedError("privacy budget: Task 3")
-    return code1.DiabetesAPI(survey, epsilon)
+    return task2.DiabetesAPI(survey, epsilon)
 
 
 def age_histogram(api, county: str) -> list:

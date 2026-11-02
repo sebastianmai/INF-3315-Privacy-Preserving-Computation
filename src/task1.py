@@ -1,6 +1,6 @@
-"""Task 1: re-identification risk of the survey API, using the public tax registry (pii.csv).
+"""Task 1: the survey API and its re-identification risk, using the public tax registry (pii.csv).
 
-Run from src/:  python reidentify.py
+Run from src/:  python task1.py
 Prints the k-anonymity figures and an example attack, and writes the heatmap
 to ../report/heatmap_county_age.pdf.
 """
@@ -13,23 +13,65 @@ import pandas as pd
 from matplotlib.colors import BoundaryNorm, ListedColormap
 from matplotlib.patches import Patch
 
-import code1
-
 HERE = Path(__file__).parent
 REPORT = HERE.parent / 'report'
+
+
+def load_survey() -> pd.DataFrame:
+    return pd.read_csv(HERE / 'survey.csv', dtype={'Zipcode': str})
+
+def load_registry() -> pd.DataFrame:
+    registry = pd.read_csv(HERE / 'pii.csv', dtype={'Zipcode': str, 'PNR': str})
+    registry['Name'] = registry['Name'].str.strip()
+    return registry
+
+
+# The survey API
+
+class SurveyAPI:
+    """The seven queries on `survey`, answered exactly."""
+
+    def __init__(self, survey: pd.DataFrame):
+        self.survey = survey
+
+    def _rows(self, condition: str, **params) -> pd.DataFrame:
+        return self.survey.query(condition, local_dict=params)
+
+    def _count(self, condition: str, **params) -> int:
+        return int(self._rows(condition, **params)['Diabetic'].sum())
+
+    def _meanAge(self, condition: str, **params) -> float:
+        return self._rows('Diabetic == 1 and ' + condition, **params)['Age'].mean()
+
+    def getDiabeticsByZip(self, zip: str) -> int:
+        return self._count('Zipcode == @zip', zip=zip)
+
+    def getDiabeticsByCounty(self, county: str) -> int:
+        return self._count('County == @county', county=county)
+
+    def getDiabeticsByAge(self, age: int) -> int:
+        return self._count('Age == @age', age=age)
+
+    def getDiabeticsByCountyAge(self, county: str, age: int) -> int:
+        return self._count('County == @county and Age == @age', county=county, age=age)
+
+    def getAverageAge(self) -> float:
+        return self._meanAge('True')
+
+    def getAvgAgeByCounty(self, county: str) -> float:
+        return self._meanAge('County == @county', county=county)
+
+    def getAvgAgeByZip(self, zip: str) -> float:
+        return self._meanAge('Zipcode == @zip', zip=zip)
+
+
+# k-anonymity of the link
 
 # Attributes survey.csv and pii.csv share (the quasi-identifier).
 QI = ['Zipcode', 'County', 'Age']
 
 # Cells with fewer respondents than this are flagged as sparse.
 SPARSE = 5
-
-survey = code1.survey
-registry = pd.read_csv(HERE / 'pii.csv', dtype={'Zipcode': str, 'PNR': str})
-registry['Name'] = registry['Name'].str.strip()
-
-
-# k-anonymity of the link
 
 def link(survey: pd.DataFrame, registry: pd.DataFrame) -> pd.DataFrame:
     """Each respondent with k = the number of registry entries sharing their quasi-identifier."""
@@ -47,7 +89,7 @@ def k_table(linked: pd.DataFrame) -> pd.DataFrame:
 
 # What the API reveals about a named person
 
-def reveal_by_zip(registry: pd.DataFrame) -> pd.DataFrame:
+def reveal_by_zip(api: SurveyAPI, registry: pd.DataFrame) -> pd.DataFrame:
     """Named people whose diabetes status follows from two API calls on their zip code.
 
     getDiabeticsByZip(zip) == 0  -> nobody in the zip is diabetic.
@@ -56,12 +98,12 @@ def reveal_by_zip(registry: pd.DataFrame) -> pd.DataFrame:
     """
     rows = []
     for zip in registry['Zipcode'].unique():
-        n = code1.getDiabeticsByZip(zip)
+        n = api.getDiabeticsByZip(zip)
         people = registry[registry['Zipcode'] == zip]
         if n == 0:
             rows.append(people.assign(Diabetic=0, Calls=f'getDiabeticsByZip({zip}) = 0'))
         elif n == 1:
-            age = code1.getAvgAgeByZip(zip)
+            age = api.getAvgAgeByZip(zip)
             match = people[people['Age'] == age]
             if len(match) == 1:
                 rows.append(match.assign(Diabetic=1, Calls=f'getDiabeticsByZip({zip}) = 1, '
@@ -112,6 +154,10 @@ def sparse_share(table: pd.DataFrame) -> tuple[int, int, int]:
 
 
 if __name__ == '__main__':
+    survey = load_survey()
+    registry = load_registry()
+    api = SurveyAPI(survey)
+
     linked = link(survey, registry)
     print(f'Linking {len(survey)} survey respondents to {len(registry)} registry entries on {QI}\n')
     print(k_table(linked).to_string(), '\n')
@@ -129,7 +175,7 @@ if __name__ == '__main__':
     print(f'Uniquely re-identified respondents (k = 1): {len(unique)}; '
           f'of them diabetic: {unique["Diabetic"].sum()}\n')
 
-    revealed = reveal_by_zip(registry)
+    revealed = reveal_by_zip(api, registry)
     print(f'Named people whose diabetes status two zip-code API calls reveal: {len(revealed)} '
           f'({revealed["Diabetic"].sum()} diabetic, {(revealed["Diabetic"] == 0).sum()} not diabetic)')
     example = revealed[revealed['Diabetic'] == 1].sort_values('Name').iloc[0]
@@ -139,7 +185,7 @@ if __name__ == '__main__':
     print(f'  -> the only diabetic in {example["Zipcode"]} is {example["Age"]}, and {example["Name"]} is the only '
           f'person of that age there: diabetic')
     print(f'  getDiabeticsByCountyAge({example["County"]!r}, {example["Age"]}) = '
-          f'{code1.getDiabeticsByCountyAge(example["County"], example["Age"])}\n')
+          f'{api.getDiabeticsByCountyAge(example["County"], example["Age"])}\n')
 
     by_age = county_table(survey, 'Age')
     cells, sparse, people = sparse_share(by_age)
